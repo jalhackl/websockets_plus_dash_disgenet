@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<style type="text/css">
+
+body {
+	margin: 0px;
+}
+
+input-plus-minus {
+	width: 100px;
+	display: block;
+	margin: 50px auto;
+}
+
+</style>
+</head>
+
+<body>
+
+<template id="input-plus-minus-template" value='!!!'>
+	<style>
+
+	button {
+		width: 25%;
+		background-color: #34495e;
+		font-weight: 700;
+		cursor: pointer;
+		box-sizing: border-box;
+		padding: 10px 5px;
+		border-top: 1px solid #34495e;
+		border-bottom: 1px solid #34495e;
+		border-left: none;
+		border-right: none;
+		color: white;
+		font-size: 24px;
+	}
+
+	input {
+		width: 50%;
+		box-sizing: border-box;
+		border-top: 1px solid #34495e;
+		border-bottom: 1px solid #34495e;
+		border-left: none;
+		border-right: none;
+		padding: 10px 5px;
+		font-size: 24px;
+		text-align: center;
+		background-color: #ecf0f1;
+	}
+
+	</style>
+	<div id="container">
+		<button id="subtract">-</button><input type="text" id="count" maxlength="2" value="1" readonly /><button id="add">+</button>
+ 	</div>
+</template>
+
+<input-plus-minus id = '123' tag = 'reeeee' schnaps='jaaaaaa'></input-plus-minus>
+<input-plus-minus id = '133' tag = 'hehehehe'></input-plus-minus>
+
+<script>
+
+class InputPlusMinus extends HTMLElement {
+
+ 	///getter and setter for custom argument TAG
+	get tag() {
+    return this.getAttribute('tag');
+  	}
+	/*
+  	set tag(val) {
+		if (val == null) { // check for null and undefined
+		this.removeAttribute('tag');
+		}
+		else {
+		this.setAttribute('tag', val);
+		}
+  	}
+	  */
+	constructor() {
+		super();
+
+		let template = document.querySelector('#input-plus-minus-template').content;
+      	this.attachShadow({ mode: 'open' }).appendChild(template.cloneNode(true));
+
+      	this.setAttribute('value', '1');
+
+      	let add_button = this.shadowRoot.querySelector("#add");
+      	let subtract_button = this.shadowRoot.querySelector("#subtract");
+      	let count_textbox = this.shadowRoot.querySelector("#count");
+
+      	add_button.addEventListener('click', () => {
+			let current = parseInt(count_textbox.value, 10);
+			count_textbox.value = current + 1;
+			console.log(this.getAttribute('tag'));
+			this.setAttribute('value', count_textbox.value);
+      	});
+
+      	subtract_button.addEventListener('click', () => {
+      		let current = parseInt(count_textbox.value, 10);
+      		if(current > 1) {
+      			count_textbox.value = current - 1;
+      			this.setAttribute('value', count_textbox.value);
+      		}
+      	});
+	}
+
+
+
+}
+
+customElements.define('input-plus-minus', InputPlusMinus);
+
+</script>
+<script>
+var x = document.getElementById('123').getAttribute('schnaps');
+console.log(x);
+</script>
+</body>
+</html>

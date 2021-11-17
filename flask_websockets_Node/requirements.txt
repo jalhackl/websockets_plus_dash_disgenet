@@ -1,0 +1,8 @@
+Flask_SocketIO==4.3.1
+python-engineio==3.13.2
+python-socketio==4.6.0
+Flask==1.1.2
+Flask-Session==0.3.2
+Flask-Sockets
+requests
+flask_cors

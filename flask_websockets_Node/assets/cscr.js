@@ -1,0 +1,1 @@
+alert('This javascript alert only reminds you that you are entering the Python Dash dashboard!')

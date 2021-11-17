@@ -1,0 +1,173 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content=
+        "width=device-width, initial-scale=1.0">
+  
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery-ui.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/SwagStyle.css') }}">
+    
+        
+            <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+            <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+            <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+            <script type="text/javascript" charset="utf-8">
+                var socket;
+                var lastval = 0;
+                
+
+                $(document).ready(function(){
+                    ///get input variables from JINJA
+                    const obj = JSON.parse('{{data| tojson | safe}}');
+                    //console.log('{{data| tojson | safe}}');
+                    for (let i = 0; i < obj.length; i++) {
+                        
+                        makeButton('#scrollbox1', obj[i].id, obj[i].msg);
+                        } 
+
+                    ///set up and connect to socket
+                    console.log('http://' + document.domain + ':' + location.port + '/chat');
+                    socket = io.connect('http://' + document.domain + ':' + location.port + '/chat');
+                    socket.io.opts.transports = ['websocket'];
+                    
+                    socket.on('connect', function() {
+                        socket.emit('join', {});
+                    });
+                    socket.on('status', function(data) {
+                        //$('#chat').val($('#chat').val() + '<' + data.msg + '>\n');
+                        //$('#chat').scrollTop($('#chat')[0].scrollHeight);
+                    });
+                    socket.on('ex', function(data) {
+
+                        switch(data.fn){
+                            case 'mkB':
+                                makeButton(data.id, data.msg, data.msg);
+                                break;
+
+                            case 'scb':
+                                settextscroll(data.id, data.msg);
+                                break;  
+                            
+                            
+                        }
+                       console.log("server returned: " + JSON.stringify(data));
+                        
+                    });
+  
+                });
+    
+  
+
+            </script>
+      
+
+      
+    <style>
+        div {
+ 
+            width: 300px;
+            height: 300px;
+            overflow: auto;
+        }
+
+        p {
+            width: 800px;
+            height: 100px;
+        }
+    </style>
+</head>
+  
+<body>
+
+    <div style = "width: 300px; height: 400px">
+
+    <h2 >SERVER SIDE VARIABLE</h2>
+    add buttons to the scrollbox <br>
+    the new button is stored in a global variable on the server so
+    clients joining late still get the full list (and populate it in js on startup)
+    <br>
+    <br>
+
+    <div class="demo" id = scrollbox1 style = "width: 150px; height: 150px; overflow:auto">
+    </div>
+    <br>
+
+    <input type="text" id="text" size="10" placeholder="Enter your message here" />
+    <button type="button" id="send" class="btn btn-success">ADD</button><br /><br />
+    the scroll state is also multicasted...
+    <br>
+    <script>
+
+
+
+
+        var container = $('#scrollbox1');
+        //var container2 = $('#scrollbox2');
+        var isScroll = false;
+        // Setting the value of scrollbar
+        $(container).mouseup(function(event) {isScroll = false;});
+        $(container).mousedown(function(event) {isScroll = true; console.log('MouseDOWN');});
+        $(container).scroll(function(event) {
+
+           
+                out = [$(container).scrollTop(), $(container).scrollLeft() ];
+                if (isScroll){
+                    socket.emit('ex', {msg: out, id: "#scrollbox1", fn: "scb"});
+                }
+        });
+
+        function settextscroll(id, val) {
+            if (!isScroll){
+              container.scrollTop(val[0]);
+              container.scrollLeft(val[1]);
+
+            //console.log(val[0],val[1])
+            }
+        }
+
+
+        $('#send').click(function(e) {
+
+                        text = $('#text').val();
+                        $('#text').val('');
+                        //socket.emit('text', {msg: text});
+            
+                        
+                        socket.emit('ex', {msg: text, id: "#scrollbox1", fn: "mkB"});
+ 
+                        //console.log({id: this.id, msg: text});
+                });
+
+
+
+
+
+        function makeButton(parent, id, text) {
+            var r = $('<input/>').attr({
+                         type: "button",
+                         id: id,
+                         value: text
+                         //onclick: "newButtonClickListener()"
+                    });
+
+            $(parent).append(r);
+
+        }
+
+
+
+                function leave_room() {
+                    socket.emit('left', {}, function() {
+                        socket.disconnect();
+                        // go back to the login page
+                        window.location.href = "{{ url_for('index') }}";
+                    });
+                }
+
+    </script>
+
+    </div>
+</body>

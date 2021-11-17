@@ -1,0 +1,105 @@
+
+
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="{{ url_for('static', filename='js/customElements.js') }}"></script>
+<script src="https://d3js.org/d3.v4.js"></script>
+
+
+  
+  
+<template id="d3pie-template" value='!!!'>
+    <svg id="container" width="100" height="100">
+      <circle id="circle" cx="50" cy="50" r="12" style fill="green" />
+    </svg>
+</template>
+
+<template id="d3bar-template" value='!!!'>
+    <svg id="container" style="width: auto">
+     
+    </svg>
+</template>
+    
+  
+<template id="gene-template" value='!!!'>
+    
+      <style>
+    
+      button {
+          width: 15%;
+          
+          font-weight: 700;
+          cursor: pointer;
+          box-sizing: border-box;
+          padding: 5px 2px;
+          border-radius: 10px;
+          border-top: 2px solid ;
+          border-bottom: 0px solid ;
+          border-left: 0px solid;
+          border-right: 2px solid ;
+          border-color:  rgb(255, 255, 255);
+          color: rgb(255, 255, 255);
+          font-size: 18px;
+      }
+    
+    
+      </style>
+    
+      <div id="container" style = "width: 120px; height: 30p0x; display: inline-block; padding: 2px 2px">
+          <button id="name" style = "width: 90px; height: 30p0x; border-top-right-radius: 0px; border-bottom-right-radius: 0px; border-right: 0px">NAN</button><button id="x" style = "width: 30px; height: 30p0x;border-top-left-radius: 0px; border-bottom-left-radius: 0px; background-color: #3d3d3d;">X</button>
+      </div>
+</template>
+
+
+<div id = 'geneBox' style = 'width: 450px; height: 150px; overflow:auto;  background-color: #adadad; display: inline-block;'>
+
+</div>
+
+<br><br>
+
+<div id= "Piecharts" style = 'width: 450px; height: 150px; overflow:auto;  background-color: #adadad; display: inline-block;'></div>
+ 
+</div>
+
+<br><br>
+<div id= "Barcharts" style = 'width: 450px; height: 150px; overflow:auto;  background-color: #adadad; display: inline-block;'></div>
+ 
+</div>
+
+
+
+
+
+
+
+
+<script>
+    function makeid(length) {
+        var result           = '';
+        var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        var charactersLength = characters.length;
+        for ( var i = 0; i < length; i++ ) {
+                result += characters.charAt(Math.floor(Math.random() * 
+                charactersLength));
+            }
+        return result;
+    }
+    
+    
+    $(document).ready(function() {
+        
+        for (let i = 0; i < 50; i++) {
+        
+            $("#geneBox").append("<gene-button id = '"+ i + "' name = '"+ makeid(Math.floor(Math.random() * 3) + 2) + "' color = '#" + Math.floor(Math.random()*16777215).toString(16) + "'></gene-button>");
+            $("#Barcharts").append("<d3bar-widget data = '{a: 76, b: 20, c:70, d:8, e:9}'></d3bar-widget>");
+            $("#Piecharts").append("<d3draw-widget data = '{a: " + Math.floor(Math.random()*100) + ", b: " + Math.floor(Math.random()*100) + ", c:" + Math.floor(Math.random()*100) + ", d:" + Math.floor(Math.random()*100) + ", e:" + Math.floor(Math.random()*100) + ", f:" + Math.floor(Math.random()*100) + ", g:" + Math.floor(Math.random()*100) + "}' color = '#" + Math.floor(Math.random()*16777215).toString(16) + "'></d3draw-widget>");
+        }
+
+    //makeGeneButton('parent', 'id', 'text');
+    
+    });
+    
+
+    
+</script>

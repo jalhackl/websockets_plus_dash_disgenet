@@ -1,0 +1,47 @@
+.app-header {
+    height: 60px;
+    line-height: 60px;
+    border-bottom: rgb(38, 138, 161) solid;
+
+    background-color: lightpink;
+}
+
+.app-headerf {
+    height: 60px;
+    line-height: 60px;
+    border-bottom: rgb(137, 161, 32) solid;
+
+    background-color: lightgreen;
+    background-image: url(network1.gif);
+}
+
+.app-headerf2 {
+    height: 60px;
+    line-height: 60px;
+    border-bottom: rgb(137, 161, 32) solid;
+
+    background-color: lightgreen;
+    background-image: url(network.gif);
+}
+
+
+.app-header .app-header--title {
+    font-size: 22px;
+    padding-left: 5px;
+
+    border-bottom: rgb(161, 38, 44) solid;
+    background-color: lightblue;
+}
+
+.app-tabcss {
+    background-image: url(network1.gif);
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+  
+  .app-tabcss2 {
+    background-image: url(network.gif);
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+  

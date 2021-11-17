@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>CHAT</title>
+    <!--Link to CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery-ui.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/SwagStyle.css') }}">
+
+    
+        <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+
+        <script type="text/javascript" charset="utf-8">
+            var socket;
+            var lastval = 0;
+            $(document).ready(function(){
+
+
+               
+
+                
+                socket = io.connect('http://' + document.domain + ':' + location.port + '/chat');
+                socket.io.opts.transports = ['websocket'];
+
+                socket.on('connect', function() {
+                    socket.emit('join', {});
+                });
+                socket.on('status', function(data) {
+                    $('#chat').val($('#chat').val() + '<' + data.msg + '>\n');
+                    $('#chat').scrollTop($('#chat')[0].scrollHeight);
+                });
+                socket.on('message', function(data) {
+                    $('#chat').val($('#chat').val() + data.msg + '\n');
+                    $('#chat').scrollTop($('#chat')[0].scrollHeight);
+                    console.log(data);
+                });
+
+                socket.on('sl1', function(data) {
+ 
+                    console.log(data.msg);
+                    $("#slider-1").slider('value', data.msg);
+                });
+
+
+
+
+                $('#send').click(function(e) {
+                        text = $('#text').val();
+                        $('#text').val('');
+                        socket.emit('text', {msg: text});
+                        console.log({msg: text});
+                });
+
+                $('#test').click(function(e) {
+                        text = 'alarm';
+                        socket.emit('test', {msg: text});
+                        console.log({msg: text});
+                });
+
+                $("#slider-1").slider({
+                    animate: true,
+                    range: "max",
+                    min: 0,
+                    max: 255,
+                    value: 128,
+                    change: function (event, ui) {
+                        if (event.originalEvent) {
+
+                                socket.emit('sl1', {msg: ui.value.toString()});
+
+                        };
+                    },
+                    slide: function (event, ui) {
+                        if (event.originalEvent) {
+                            var nsize = {"nsize":ui.value};
+                            if ((ui.value - lastval) > 10 || (ui.value - lastval) < -10 ){
+                                socket.emit('sl1', {msg: ui.value.toString()});
+                                //console.log(nsize);
+                                lastval = ui.value;
+                            };
+
+                        };
+                    }
+
+                });
+            });
+
+            
+            function leave_room() {
+                socket.emit('left', {}, function() {
+                    socket.disconnect();
+                    // go back to the login page
+                    window.location.href = "{{ url_for('index') }}";
+                });
+            }
+
+            function enter_dash() {
+                socket.emit('ds', {}, function() {
+                  //  socket.disconnect();
+                    
+                    window.location.href = "{{ url_for('/dashboard/') }}";
+                });
+            }
+        </script>
+  </head>
+
+  <body class="text-center">
+    <div style = "width: 300px; height: 400px">
+    <div class="chatwindow">
+      <h2 >CHAT EXAMPLE</h2>
+        The chat box is multicasted both to web clients (SocketIO directly in flask) AND Ue4 clients (POST Request to "MiddleNode" Server) <br><br>
+        
+      <textarea id="chat" cols="37" rows="10" placeholder="No messages yet. Start one..."></textarea><br /><br />
+      <input type="text" id="text" size="20" placeholder="Enter your message here" />
+      <button type="button" id="send" class="btn btn-success">SEND</button>
+    <br><br>
+    this slider also gets multicasted, but only to webclients 
+      <div id="slider-1"></div>
+      <center><button type="button" class="btn btn-danger" onclick=leave_room()>Leave this Chat</button></center>
+
+      <div id="slider-2"></div>
+      <center><button type="button" class="btn btn-danger" onclick=enter_dash()>Go to Dash app</button></center>
+
+      <br>
+    NOTE: Only 5 clients can connect per browser, you can open a different browser to get 5 more
+    </div>
+    </div>
+  </body>
+</html>
