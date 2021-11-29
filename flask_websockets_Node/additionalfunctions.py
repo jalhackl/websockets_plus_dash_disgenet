@@ -150,9 +150,9 @@ def alldiseasegenegraphs(data):
 
   diseasenodesfull = data [["diseaseId", "diseaseName"]]
   diseasenodesfull.columns = ['number', 'abbr']
-
-  genenodesfull = data[["geneId", "geneSymbol"]]
-  genenodesfull.columns = ['number', 'abbr']
+ # dpi added
+  genenodesfull = data[["geneId", "geneSymbol", "DPI"]]
+  genenodesfull.columns = ['number', 'abbr', 'dpi']
 
   bothedges = data[["geneId", "diseaseId"]]
 
@@ -238,7 +238,11 @@ def alldiseasegenegraphs(data):
     xxg = geneedgespd.loc[geneedgespd['target'] == gene, ['source']]
 
     genedegree = genedegree + len(xxg)
-    genegenedegrees.append([disease, genedegree])
+    genegenedegrees.append([gene, genedegree])
+  
+  #no node duplicates
+  genenodesfull=pd.DataFrame(genenodesfull).drop_duplicates()
+  diseasenodesfull=pd.DataFrame(diseasenodesfull).drop_duplicates()
 
   return genenodesfull, geneedgespd, diseasenodesfull, diseaseedgespd, diseasedegrees, disdisdegrees, genegenedegrees
 

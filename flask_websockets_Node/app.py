@@ -273,19 +273,23 @@ colors = {
 
 header_list = ["number", "abbr", "name", "function", "attr"]
 header_list_nodes = header_list
-dfnodes = pd.read_csv('input\sample_nodes1.csv', names = header_list)
+dfnodes = pd.read_csv('flask_websockets_Node\input\sample_nodes1.csv', names = header_list)
 
 header_list = ["number", "xc", "yc", "zc", "xrgb", "yrgb", "zrgb", "100", "attr"]
-dflayout = pd.read_csv('input\sample_layout1.csv', names = header_list)
+dflayout = pd.read_csv('flask_websockets_Node\input\sample_layout1.csv', names = header_list)
 
 header_list = ["source", "target"]
-dfedges = pd.read_csv('input\sample_links1.csv', names = header_list)
+dfedges = pd.read_csv('flask_websockets_Node\input\sample_links1.csv', names = header_list)
 
 df = dfnodes
 
 edges = [{'data': {'source': x, 'target': y}} for x,y in zip(dfedges.source,dfedges.target)]
 
+
+#nodes = [{'data': {'id': x, 'label': y, 'size': 1}} for x,y in zip(dfnodes.number,dfnodes.abbr)]
+
 nodes = [{'data': {'id': x, 'label': y}} for x,y in zip(dfnodes.number,dfnodes.abbr)]
+
 
 coord = [{'position': {'x': x, 'y':y }} for x,y in zip( dflayout.xc * 100, dflayout.yc * 100)]
 
@@ -389,6 +393,27 @@ tab1 = html.Div(children=[
 )
 ])
 
+
+default_stylesheet = [
+    {
+        "selector": "node",
+        "style": {
+           # "width": "mapData(size, 0, 100, 20, 60)",
+           # "height": "mapData(size, 0, 100, 20, 60)",
+           #"size": "mapData(size, 0, 100, 20, 60)",
+           "height": "data(size)",
+           "width": "data(size)",
+           #'background-color': '#B10DC9',
+           'background-color': "data(color)",
+           "border-color": "data(color)",
+            "content": "data(label)",
+            "font-size": "12px",
+            "text-valign": "center",
+            "text-halign": "center",
+        }
+    }
+]
+
 tab2 = html.Div([
     html.H3('Gene network'),
 
@@ -405,6 +430,7 @@ tab2 = html.Div([
     ),
 
      html.Button('Update Graph', id='updatecyto', n_clicks_timestamp=0),
+     html.H3('Coloring according to DPI value (disease pleiotropy index, indicates the number of different disease classes a gene is associated with) '),
 #cytoscape element
     cyto.Cytoscape(
         id='cytoscapenetw',
@@ -415,7 +441,8 @@ tab2 = html.Div([
         elements=elements,
         layout={
             'name': 'circle'
-        }
+        },
+         stylesheet=default_stylesheet
     ),
     html.Pre(id='cytoscape-tapNodeData-json', style=styles['pre']),
 
@@ -453,14 +480,47 @@ def displayTapNodeData(data):
     Input('updatecyto', 'n_clicks_timestamp'))
 def set_elements( llayout, graphelement):
 
-    nodes = [{'data': {'id': x, 'label': y}} for x,y in zip(dfnodes.number,dfnodes.abbr)]
-    edges = [{'data': {'source': x, 'target': y}} for x,y in zip(dfedges.source,dfedges.target)]
+    if (uploadsort == 'D'):
+        disses = [x[1] for x in genegenedegrees]
 
-    layout={ 'name': llayout}
+        #nodes = [{'data': {'id': x, 'label': y}} for x,y in zip(dfnodes.number,dfnodes.abbr)]
+        
+        
+        #nodes = [{'data': {'id': x, 'label': y, 'size': z*5+5}} for x,y,z in zip(dfnodes.number,dfnodes.abbr, disses)]
+        colors = []
+        for colorelem in dfnodes.dpi:
+            if (float(colorelem) < float(400)):
+                col = "yellow"
+                colors.append(col)
+            elif (float(colorelem) < float(600)):
+                col = "green"
+                colors.append(col)
+            elif (float(colorelem) < float(800)):
+                col = "red"
+                colors.append(col)
+            else:
+                col = "blue"
+                colors.append(col)
 
-    elements = nodes + edges
+        #coloring according to dpi
+        nodes = [{'data': {'id': x, 'label': y, 'size': z*5+5, 'color': a}} for x,y,z,a in zip(dfnodes.number,dfnodes.abbr, disses, colors)]    
+
+        edges = [{'data': {'source': x, 'target': y}} for x,y in zip(dfedges.source,dfedges.target)]
+
+        layout={ 'name': llayout}
+
+        elements = nodes + edges
+    else:
+
+        nodes = [{'data': {'id': x, 'label': y}} for x,y in zip(dfnodes.number,dfnodes.abbr)]
+        edges = [{'data': {'source': x, 'target': y}} for x,y in zip(dfedges.source,dfedges.target)]
+
+        layout={ 'name': llayout}
+
+        elements = nodes + edges
 
     return elements, layout
+
 
 
 
@@ -644,6 +704,8 @@ def display_color(binnumber, histoselectgraph):
             genegenedegreedata.append(elem[1])
    
         fig = px.histogram(genegenedegreedata, nbins = binnumber)
+
+        
   
     return fig
 
